@@ -20,7 +20,7 @@ Application web métier, single-surface responsive (desktop-first, repli tablett
 | Surface | Atteinte depuis | Objectif |
 |---|---|---|
 | Portail / Accueil | Redirection automatique après connexion | Point d'entrée unique ; expose les 7 domaines fonctionnels du processus de préparation budgétaire |
-| Gestion des référentiels (MS) | Carte "Gestion des référentiels" | Administration des données de référence communes |
+| Gestion des référentiels (MS) → Écran 0 | Carte "Gestion des référentiels" | Tableau de bord des référentiels : vue synthétique et accès à leur gestion |
 | Planification des crédits (MS) | Carte "Planification des crédits" | Programmation et répartition des enveloppes budgétaires |
 | Cadrage budgétaire (MS) | Carte "Cadrage budgétaire" | Définition des plafonds et orientations budgétaires |
 | Marquage (MS) | Carte "Marquage" | Identification et suivi des lignes budgétaires |
@@ -28,9 +28,20 @@ Application web métier, single-surface responsive (desktop-first, repli tablett
 | Dialogue (MS) | Carte "Dialogue" | Échanges et arbitrages entre acteurs du processus |
 | PLF (MS) | Carte "PLF" | Élaboration du Projet de Loi de Finances |
 
-Le Portail est un hub plat — aucune carte ne contient de sous-navigation à ce niveau ; chaque carte est une porte d'entrée vers un microservice indépendant. Pas de niveau de profondeur supplémentaire prévu sur cet écran.
+Le Portail est un hub plat — aucune carte ne contient de sous-navigation à ce niveau ; chaque carte est une porte d'entrée vers un microservice indépendant.
+
+Le MS Référentiels, une fois ouvert, expose son propre niveau de profondeur : un Écran 0 (tableau de bord) avec un menu de navigation vers 6 référentiels — Organisation, Programme, Compte budgétaire, Source de financement, Objectif, Complément — chacun affiché en carte de synthèse chiffrée sur l'Écran 0. Cf. `mockups/referentiels-tableau-de-bord.html`.
 
 → Référence de composition : `mockups/portail-ecran-accueil.html`. Le spine gagne en cas de conflit.
+
+**Architecture des mockups (Navbar/Sidebar réutilisables).** Les écrans HTML partagent une base commune sous `mockups/shared/` :
+- `tokens.css` — variables de charte (couleurs, rayons, ombres), source unique ; `components.css` — reset, Navbar globale, Sidebar générique, composant `.card` de base.
+- `app.js` — expose `SIGIF.mountNavbar(selector, opts)` (rend la Navbar identique sur toutes les pages, avec menu utilisateur et sélecteur de thème fonctionnels) et `SIGIF.mountSidebar(selector, items)` (rend une Sidebar dont les items varient par module, sans dupliquer le HTML/CSS de la coquille).
+Chaque écran ne définit que : ses styles propres à son contenu, la liste de ses items de sidebar (le cas échéant) et les options de sa navbar. Le Portail n'a pas de sidebar (hub plat) ; le MS Référentiels en a une listant ses 6 référentiels. Un nouveau module ajoute sa propre liste d'items sans toucher à `app.js`.
+
+`components.css` porte aussi `.page-banner` — le bandeau d'identification ("Portail SIGIF" / "Processus de préparation du budget de l'État du Sénégal") avec son icône d'institution. C'est un composant de base répété à l'identique en haut de **chaque** écran (Portail comme MS), pas seulement le Portail — il ancre visuellement toute page dans le programme, indépendamment du module consulté.
+
+`app.js` va au-delà de la coquille : `SIGIF.mountBanner(selector, {icon, eyebrow, text})` rend ce bandeau, `SIGIF.mountBreadcrumb(selector, crumbs)` rend le fil d'ariane à partir d'une liste `{label, href}`, et `SIGIF.mountCards(selector, items)` rend une grille de `.card` — variante "domaine" (flèche de navigation) quand l'item n'a pas de `stat`, variante "statistique" (valeur chiffrée, donut optionnel) quand il en a une. Chaque écran ne fournit plus que des tableaux de données ; aucune balise SVG ou structure de carte n'est dupliquée en HTML d'une page à l'autre — un nouvel écran (ex. futur MS Crédit) compose sa page avec les mêmes appels `SIGIF.mount*` et ses propres données.
 
 ## Voice and Tone
 

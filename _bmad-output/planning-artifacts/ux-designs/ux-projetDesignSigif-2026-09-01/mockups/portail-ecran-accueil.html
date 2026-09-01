@@ -7,286 +7,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<link rel="stylesheet" href="shared/components.css">
 <style>
-  :root {
-    --bg: #f7f5ee;
-    --surface: #ffffff;
-    --border: #e6e2d3;
-    --ink: #1c2321;
-    --ink-soft: #55625a;
-    --ink-faint: #94a196;
-    --accent: #1b4332;
-    --accent-soft: #dcefe1;
-    --accent-ink: #14321f;
-    --gold: #f59e0b;
-    --gold-soft: #fef3c7;
-    --orange: #f97316;
-    --orange-soft: #ffedd5;
-    --leaf: #16a34a;
-    --leaf-soft: #dcfce7;
-    --radius: 16px;
-    --shadow: 0 1px 2px rgba(20, 50, 31, 0.05), 0 1px 3px rgba(20, 50, 31, 0.06);
-    --shadow-md: 0 12px 28px -10px rgba(20, 50, 31, 0.18), 0 4px 10px -4px rgba(20, 50, 31, 0.08);
-  }
-
-  body[data-theme="blue"] {
-    --accent: #2563eb;
-    --accent-soft: #dbeafe;
-    --accent-ink: #1e3a8a;
-  }
-
-  * { box-sizing: border-box; }
+  /* Styles propres à l'écran Portail / Accueil */
   html, body {
-    margin: 0;
-    height: 100%;
-    font-family: 'Inter', system-ui, sans-serif;
     background:
       radial-gradient(1100px 420px at 85% -8%, rgba(27, 67, 50, 0.06), transparent 60%),
       var(--bg);
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-  a { color: inherit; text-decoration: none; }
-  ul { list-style: none; margin: 0; padding: 0; }
-
-  .topbar-wrap {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #ffffff;
-    border-bottom: 1px solid var(--border);
-  }
-  .topbar {
-    width: 100%;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 16px 36px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
   }
 
   .main {
     width: 100%;
-    max-width: 1180px;
+    max-width: var(--content-max-w);
     margin: 0 auto;
     padding: 36px 36px 64px;
     display: flex;
     flex-direction: column;
     gap: 32px;
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .brand-mark {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .brand-mark img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .brand-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: -0.01em;
-  }
-  .brand-sub {
-    font-size: 10px;
-    color: var(--ink-faint);
-    margin-top: 1px;
-  }
-  .topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .icon-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: transparent;
-    border: none;
-    color: var(--ink-soft);
-    position: relative;
-    cursor: pointer;
-    transition: background 0.12s ease;
-  }
-  .icon-btn:hover { background: var(--bg); }
-  .icon-btn .dot {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--orange);
-  }
-  .user-menu-wrap {
-    position: relative;
-  }
-  .user-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: transparent;
-    border: none;
-    border-radius: 999px;
-    padding: 5px 6px 5px 5px;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background 0.12s ease;
-  }
-  .user-chip:hover { background: var(--bg); }
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .user-chip .user-meta { display: flex; flex-direction: column; line-height: 1.25; text-align: left; }
-  .user-chip .user-name { font-size: 12px; font-weight: 700; color: var(--ink); }
-  .user-chip .user-role { font-size: 10.5px; color: var(--ink-faint); }
-  .user-chip .chevron { color: var(--ink-faint); flex-shrink: 0; transition: transform 0.15s ease; }
-  .user-chip[aria-expanded="true"] .chevron { transform: rotate(180deg); }
-
-  /* User dropdown */
-  .user-menu {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    width: 240px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-md);
-    padding: 16px;
-    z-index: 20;
-    opacity: 0;
-    transform: translateY(-6px);
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-  }
-  .user-menu.is-open {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-    pointer-events: auto;
-  }
-  .user-menu-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 10px;
-  }
-  .theme-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 8px;
-    border-radius: 10px;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--ink);
-    cursor: pointer;
-    transition: background 0.12s ease;
-  }
-  .theme-option:hover { background: var(--bg); }
-  .theme-option.is-selected {
-    background: var(--bg);
-  }
-  .theme-swatch {
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    flex-shrink: 0;
-  }
-  .theme-swatch-blue { background: #2563eb; }
-  .theme-swatch-green {
-    background: linear-gradient(135deg, var(--accent-ink) 50%, var(--gold) 50%);
-  }
-  .theme-option-label { flex: 1; }
-  .theme-check { display: none; color: var(--accent); flex-shrink: 0; }
-  .theme-option.is-selected .theme-check { display: block; }
-  .user-menu-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 12px 0;
-  }
-  .user-menu-logout {
-    padding: 8px;
-    border-radius: 10px;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--ink);
-    cursor: pointer;
-    transition: background 0.12s ease;
-  }
-  .user-menu-logout:hover { background: var(--bg); }
-
-  /* Greeting banner */
-  .greeting {
-    position: relative;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 30px;
-    box-shadow: var(--shadow);
-  }
-  .greeting-eyebrow {
-    position: relative;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-    margin-bottom: 8px;
-  }
-  .greeting-head {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .greeting-title {
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-  }
-  .greeting-sub {
-    position: relative;
-    margin-top: 6px;
-    font-size: 13px;
-    color: var(--ink-soft);
-    max-width: 600px;
-    line-height: 1.55;
   }
 
   .section-head {
@@ -296,12 +34,7 @@
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
   }
-  .section-title {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: -0.005em;
-    color: var(--ink);
-  }
+  .section-title { font-size: 15px; font-weight: 800; letter-spacing: -0.005em; color: var(--ink); }
   .section-count {
     font-size: 11px;
     font-weight: 700;
@@ -314,92 +47,14 @@
     margin-left: 16px;
   }
 
-  /* Domain grid */
+  /* Grille des domaines fonctionnels */
   .domains {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
-
-  .domain-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    min-height: 160px;
-    transition: box-shadow 0.2s cubic-bezier(.2,.7,.3,1), transform 0.2s cubic-bezier(.2,.7,.3,1), border-color 0.2s ease;
-  }
-  .domain-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    border-color: var(--accent);
-  }
-  .domain-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-  .domain-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 13px;
-    background: var(--accent-soft);
-    color: var(--accent-ink);
-    flex-shrink: 0;
-  }
-  .domain-icon.gold { background: var(--gold-soft); color: #92610a; }
-  .domain-icon.orange { background: var(--orange-soft); color: #c2410c; }
-  .domain-icon.leaf { background: var(--leaf-soft); color: #15803d; }
-
-  .domain-arrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--bg);
-    color: var(--ink-faint);
-    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
-  }
-  .domain-card:hover .domain-arrow {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  .domain-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .domain-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-    line-height: 1.3;
-  }
-  .domain-desc {
-    font-size: 11.5px;
-    color: var(--ink-faint);
-    line-height: 1.45;
-  }
-
-  svg { display: block; }
-
-  a:focus-visible,
-  button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
+  .domain-card { min-height: 160px; }
+  .card-icon { width: 48px; height: 48px; }
 
   @media (max-width: 1080px) {
     .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -415,286 +70,86 @@
 </head>
 <body>
 
-<div class="topbar-wrap">
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-mark"><img src="logo.png" alt="Logo SIGIF"></div>
-      <div>
-        <div class="brand-name">SIGIF</div>
-        <div class="brand-sub">Préparation budgétaire</div>
-      </div>
-    </div>
-    <div class="topbar-actions">
-      <div class="icon-btn">
-        <span class="dot"></span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.7 21a2 2 0 0 1-3.4 0"></path>
-        </svg>
-      </div>
-      <div class="user-menu-wrap" id="user-menu-wrap">
-        <button class="user-chip" type="button" id="user-menu-trigger" aria-expanded="false" aria-haspopup="true">
-          <div class="user-avatar">AD</div>
-          <div class="user-meta">
-            <span class="user-name">Agent DPB</span>
-            <span class="user-role">Administrateur DPB</span>
-          </div>
-          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
+<div class="app-shell">
+  <div class="app-main">
 
-        <div class="user-menu" id="user-menu">
-          <div class="user-menu-label">Thème de couleur</div>
-          <div class="theme-option" data-theme-option="blue">
-            <span class="theme-swatch theme-swatch-blue"></span>
-            <span class="theme-option-label">Bleu</span>
-            <svg class="theme-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <div class="theme-option is-selected" data-theme-option="green">
-            <span class="theme-swatch theme-swatch-green"></span>
-            <span class="theme-option-label">Vert</span>
-            <svg class="theme-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <div class="user-menu-divider"></div>
-          <div class="user-menu-logout" id="user-menu-logout">Déconnexion</div>
-        </div>
+    <div id="navbar-mount"></div>
+
+    <main class="main">
+
+      <div id="banner-mount"></div>
+
+      <div class="section-head">
+        <div class="section-title">Domaines fonctionnels du processus de préparation budgétaire</div>
+        <div class="section-count">7 domaines</div>
       </div>
-    </div>
+
+      <div class="domains" id="domains-mount"></div>
+
+    </main>
   </div>
 </div>
 
-<main class="main">
-
-    <div class="greeting">
-      <div class="greeting-eyebrow">Portail SIGIF</div>
-      <div class="greeting-head">
-        <div class="greeting-title">Bonjour, Agent DPB</div>
-      </div>
-      <div class="greeting-sub">
-        Processus de préparation du budget de l'État du Sénégal
-      </div>
-    </div>
-
-    <div class="section-head">
-      <div class="section-title">Domaines fonctionnels du processus de préparation budgétaire</div>
-      <div class="section-count">7 domaines</div>
-    </div>
-
-    <!-- Grille des microservices / domaines fonctionnels -->
-    <div class="domains">
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon leaf">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <ellipse cx="12" cy="5" rx="8" ry="3"></ellipse>
-              <path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path>
-              <path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">Gestion des référentiels</div>
-          <div class="domain-desc">Administration des données de référence communes</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon gold">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-              <line x1="8" y1="15" x2="14" y2="15"></line>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">Planification des crédits</div>
-          <div class="domain-desc">Programmation et répartition des enveloppes budgétaires</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon orange">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18"></path>
-              <path d="M7 16l3.5-5 3 3L19 7"></path>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">Cadrage budgétaire</div>
-          <div class="domain-desc">Définition des plafonds et orientations budgétaires</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 11l3 3L22 4"></path>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">Marquage</div>
-          <div class="domain-desc">Identification et suivi des lignes budgétaires</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon leaf">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="9"></circle>
-              <circle cx="12" cy="12" r="5"></circle>
-              <circle cx="12" cy="12" r="1"></circle>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">GAR / Cadrage de performance</div>
-          <div class="domain-desc">Gestion axée sur les résultats et suivi de performance</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon gold">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.7 8.7 0 0 1-4-1L3 20l1-5.5A8.4 8.4 0 1 1 21 11.5z"></path>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">Dialogue</div>
-          <div class="domain-desc">Échanges et arbitrages entre acteurs du processus</div>
-        </div>
-      </a>
-
-      <a class="domain-card" href="#">
-        <div class="domain-top">
-          <div class="domain-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="9" y1="13" x2="15" y2="13"></line>
-              <line x1="9" y1="17" x2="13" y2="17"></line>
-            </svg>
-          </div>
-          <span class="domain-arrow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="19" x2="19" y2="5"></line>
-              <polyline points="9 5 19 5 19 15"></polyline>
-            </svg>
-          </span>
-        </div>
-        <div class="domain-body">
-          <div class="domain-title">PLF</div>
-          <div class="domain-desc">Élaboration du Projet de Loi de Finances</div>
-        </div>
-      </a>
-
-    </div>
-
-  </main>
-
+<script src="shared/app.js"></script>
 <script>
-  (function () {
-    var trigger = document.getElementById('user-menu-trigger');
-    var menu = document.getElementById('user-menu');
-    var wrap = document.getElementById('user-menu-wrap');
-    var logout = document.getElementById('user-menu-logout');
-    var themeOptions = document.querySelectorAll('.theme-option');
+  SIGIF.mountNavbar('#navbar-mount', {
+    brandSub: 'Préparation budgétaire',
+    userName: 'Agent DPB',
+    userRole: 'Administrateur DPB',
+    userInitials: 'AD'
+  });
 
-    function openMenu() {
-      menu.classList.add('is-open');
-      trigger.setAttribute('aria-expanded', 'true');
+  SIGIF.mountBanner('#banner-mount', {
+    eyebrow: 'Portail SIGIF',
+    text: "Processus de préparation du budget de l'État du Sénégal"
+  });
+
+  // Les 7 domaines fonctionnels — chaque carte est la porte d'entrée d'un microservice
+  SIGIF.mountCards('#domains-mount', [
+    {
+      icon: 'orgTree', tint: 'leaf',
+      title: 'Gestion des référentiels',
+      desc: 'Administration des données de référence communes',
+      href: 'referentiels-tableau-de-bord.html'
+    },
+    {
+      icon: 'programme', tint: 'gold',
+      title: 'Planification des crédits',
+      desc: 'Programmation et répartition des enveloppes budgétaires',
+      href: '#'
+    },
+    {
+      icon: 'chart', tint: 'orange',
+      title: 'Cadrage budgétaire',
+      desc: 'Définition des plafonds et orientations budgétaires',
+      href: '#'
+    },
+    {
+      icon: 'tag',
+      title: 'Marquage',
+      desc: 'Identification et suivi des lignes budgétaires',
+      href: '#'
+    },
+    {
+      icon: 'objectif', tint: 'leaf',
+      title: 'GAR / Cadrage de performance',
+      desc: 'Gestion axée sur les résultats et suivi de performance',
+      href: '#'
+    },
+    {
+      icon: 'message', tint: 'gold',
+      title: 'Dialogue',
+      desc: 'Échanges et arbitrages entre acteurs du processus',
+      href: '#'
+    },
+    {
+      icon: 'doc',
+      title: 'PLF',
+      desc: 'Élaboration du Projet de Loi de Finances',
+      href: '#'
     }
-    function closeMenu() {
-      menu.classList.remove('is-open');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
-    function toggleMenu() {
-      if (menu.classList.contains('is-open')) { closeMenu(); } else { openMenu(); }
-    }
-
-    trigger.addEventListener('click', function (e) {
-      e.stopPropagation();
-      toggleMenu();
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!wrap.contains(e.target)) { closeMenu(); }
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { closeMenu(); }
-    });
-
-    themeOptions.forEach(function (opt) {
-      opt.addEventListener('click', function () {
-        themeOptions.forEach(function (o) { o.classList.remove('is-selected'); });
-        opt.classList.add('is-selected');
-        var theme = opt.getAttribute('data-theme-option');
-        if (theme === 'blue') {
-          document.body.setAttribute('data-theme', 'blue');
-        } else {
-          document.body.removeAttribute('data-theme');
-        }
-      });
-    });
-
-    logout.addEventListener('click', function () {
-      closeMenu();
-    });
-  })();
+  ]);
 </script>
 
 </body>
 </html>
-

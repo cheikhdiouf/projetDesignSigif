@@ -11,9 +11,8 @@
       SIGIF.mountSidebar('#sidebar-mount', [
         { icon: 'orgTree', label: 'Organisation', href: '#', active: true },
         { icon: 'programme', label: 'Programme', href: '#' },
-      ]);
+      ], { brandSub: 'Préparation budgétaire' });
       SIGIF.mountNavbar('#navbar-mount', {
-        brandSub: 'Préparation budgétaire',
         userName: 'Agent DPB',
         userRole: 'Administrateur DPB',
         userInitials: 'AD'
@@ -81,7 +80,21 @@
       '<line x1="10" y1="18" x2="10" y2="11"></line>' +
       '<line x1="14" y1="18" x2="14" y2="11"></line>' +
       '<line x1="18" y1="18" x2="18" y2="11"></line>' +
-      '<polygon points="12 2 20 7 4 7 12 2"></polygon>'
+      '<polygon points="12 2 20 7 4 7 12 2"></polygon>',
+    search:
+      '<circle cx="11" cy="11" r="7"></circle>' +
+      '<line x1="21" y1="21" x2="16.65" y2="16.65"></line>',
+    filter:
+      '<polygon points="4 4 20 4 14 12.5 14 19 10 21 10 12.5 4 4"></polygon>',
+    plus:
+      '<line x1="12" y1="5" x2="12" y2="19"></line>' +
+      '<line x1="5" y1="12" x2="19" y2="12"></line>',
+    chevronLeft: '<polyline points="15 18 9 12 15 6"></polyline>',
+    chevronRight: '<polyline points="9 18 15 12 9 6"></polyline>',
+    dots:
+      '<circle cx="12" cy="5" r="1.5"></circle>' +
+      '<circle cx="12" cy="12" r="1.5"></circle>' +
+      '<circle cx="12" cy="19" r="1.5"></circle>'
   };
 
   function svg(iconKey, size) {
@@ -93,25 +106,59 @@
 
   // ---- Sidebar ---------------------------------------------------------
   // items: [{ icon, label, href, active }] ou [{ label, type: 'label' }]
-  function mountSidebar(targetSelector, items) {
+  // brand (optionnel): { logoSrc, brandSub }
+  function mountSidebar(targetSelector, items, brand) {
     var el = document.querySelector(targetSelector);
     if (!el) { return; }
-    el.innerHTML = items.map(function (item) {
+    var navHtml = items.map(function (item) {
       if (item.type === 'label') {
         return '<div class="app-nav-label">' + item.label + '</div>';
       }
       var cls = 'app-nav-item' + (item.active ? ' is-active' : '');
       return '<a class="' + cls + '" href="' + (item.href || '#') + '">' +
-        svg(item.icon, 17) + item.label + '</a>';
+        svg(item.icon, 17) + '<span class="app-nav-item-label">' + item.label + '</span></a>';
     }).join('');
+    el.innerHTML = navHtml;
+
+    if (brand) {
+      var logoSrc = brand.logoSrc || 'logo.png';
+      var header = document.createElement('div');
+      header.className = 'app-sidebar-brand';
+      header.innerHTML =
+        '<div class="brand-mark"><img src="' + logoSrc + '" alt="Logo SIGIF"></div>' +
+        '<div>' +
+          '<div class="brand-name">SIGIF</div>' +
+          (brand.brandSub ? '<div class="brand-sub">' + brand.brandSub + '</div>' : '') +
+        '</div>';
+      el.parentNode.insertBefore(header, el);
+    }
+
+    // Bouton de compression / décompression de la sidebar — commun à tout le projet
+    var sidebarEl = el.closest ? el.closest('.app-sidebar') : el.parentNode;
+    if (sidebarEl && !sidebarEl.querySelector('.sidebar-toggle')) {
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'sidebar-toggle';
+      toggle.title = 'Réduire / agrandir le menu';
+      toggle.setAttribute('aria-label', 'Réduire ou agrandir le menu');
+      toggle.textContent = '‹';
+      sidebarEl.insertBefore(toggle, sidebarEl.firstChild);
+
+      var storedCollapsed = false;
+      try { storedCollapsed = localStorage.getItem('sigif-sidebar-collapsed') === '1'; } catch (e) {}
+      if (storedCollapsed) { sidebarEl.classList.add('is-collapsed'); }
+
+      toggle.addEventListener('click', function () {
+        var isCollapsed = sidebarEl.classList.toggle('is-collapsed');
+        try { localStorage.setItem('sigif-sidebar-collapsed', isCollapsed ? '1' : '0'); } catch (e) {}
+      });
+    }
   }
 
   // ---- Navbar ------------------------------------------------------------
-  // opts: { brandSub, userName, userRole, userInitials, logoSrc }
+  // opts: { userName, userRole, userInitials }
   function mountNavbar(targetSelector, opts) {
     opts = opts || {};
-    var logoSrc = opts.logoSrc || 'logo.png';
-    var brandSub = opts.brandSub || 'Préparation budgétaire';
     var userName = opts.userName || 'Utilisateur connecté';
     var userRole = opts.userRole || '';
     var userInitials = opts.userInitials || 'U';
@@ -122,13 +169,6 @@
     el.innerHTML =
       '<div class="topbar-wrap">' +
         '<div class="topbar">' +
-          '<div class="brand">' +
-            '<div class="brand-mark"><img src="' + logoSrc + '" alt="Logo SIGIF"></div>' +
-            '<div>' +
-              '<div class="brand-name">SIGIF</div>' +
-              '<div class="brand-sub">' + brandSub + '</div>' +
-            '</div>' +
-          '</div>' +
           '<div class="topbar-actions">' +
             '<div class="icon-btn">' +
               '<span class="dot"></span>' +
@@ -247,22 +287,83 @@
         : '<span class="card-arrow">' + svg('arrowUpRight', 13) + '</span>';
 
       var body = item.stat
-        ? '<div class="card-title">' + item.title + '</div>' +
-          '<div class="stat-value-row">' +
+        ? '<div class="stat-value-row">' +
             '<span class="stat-value">' + item.stat.value + '</span>' +
             '<span class="stat-label">' + item.stat.label + '</span>' +
           '</div>'
-        : '<div class="card-title">' + item.title + '</div>' +
-          '<div class="card-desc">' + (item.desc || '') + '</div>';
+        : '<div class="card-desc">' + (item.desc || '') + '</div>';
 
       return '<a class="card' + (item.stat ? ' stat-card' : ' domain-card') + '" href="' + (item.href || '#') + '">' +
         '<div class="card-top">' +
           '<div class="card-icon' + tintClass + '">' + svg(item.icon, 20) + '</div>' +
+          '<div class="card-title">' + item.title + '</div>' +
           topRight +
         '</div>' +
         body +
       '</a>';
     }).join('');
+  }
+
+  // ---- Barre d'outils liste : recherche + filtre ---------------------------
+  // opts: { placeholder, filterLabel }
+  function mountToolbar(targetSelector, opts) {
+    opts = opts || {};
+    var placeholder = opts.placeholder || 'Rechercher…';
+    var filterLabel = opts.filterLabel || 'Filtrer';
+    var el = document.querySelector(targetSelector);
+    if (!el) { return; }
+    el.innerHTML =
+      '<div class="toolbar">' +
+        '<div class="search-box">' +
+          svg('search', 16) +
+          '<input type="text" placeholder="' + placeholder + '">' +
+        '</div>' +
+        '<button class="filter-btn" type="button" title="' + filterLabel + '">' +
+          svg('filter', 15) + '<span>' + filterLabel + '</span>' +
+        '</button>' +
+      '</div>';
+  }
+
+  // ---- Liste / tableau de référentiel --------------------------------------
+  // opts: { title, count, columns: [label...], rows: [[cellHtml...]], page, pageCount }
+  function mountTable(targetSelector, opts) {
+    opts = opts || {};
+    var columns = opts.columns || [];
+    var rows = opts.rows || [];
+    var page = opts.page || 1;
+    var pageCount = opts.pageCount || 1;
+    var el = document.querySelector(targetSelector);
+    if (!el) { return; }
+
+    var thead = '<thead><tr>' + columns.map(function (c) {
+      return '<th>' + c + '</th>';
+    }).join('') + '<th></th></tr></thead>';
+
+    var tbody = '<tbody>' + rows.map(function (r) {
+      return '<tr>' + r.map(function (cell) {
+        return '<td>' + cell + '</td>';
+      }).join('') + '<td class="row-actions">' + svg('dots', 16) + '</td></tr>';
+    }).join('') + '</tbody>';
+
+    var pageBtns = '';
+    for (var i = 1; i <= pageCount; i++) {
+      pageBtns += '<button class="page-btn' + (i === page ? ' is-active' : '') + '">' + i + '</button>';
+    }
+
+    el.innerHTML =
+      '<div class="list-card">' +
+        '<div class="list-card-head">' +
+          '<div class="list-card-title">' + (opts.title || '') +
+            (opts.count != null ? '<span class="badge">' + opts.count + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="table-wrap"><table class="data-table">' + thead + tbody + '</table></div>' +
+        '<div class="pagination">' +
+          '<button class="page-btn" type="button">' + svg('chevronLeft', 15) + '</button>' +
+          pageBtns +
+          '<button class="page-btn" type="button">' + svg('chevronRight', 15) + '</button>' +
+        '</div>' +
+      '</div>';
   }
 
   global.SIGIF = {
@@ -272,6 +373,8 @@
     mountNavbar: mountNavbar,
     mountBanner: mountBanner,
     mountBreadcrumb: mountBreadcrumb,
-    mountCards: mountCards
+    mountCards: mountCards,
+    mountToolbar: mountToolbar,
+    mountTable: mountTable
   };
 })(window);

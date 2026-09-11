@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MS Référentiels - Organisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<link rel="stylesheet" href="shared/components.css">
+<style>
+  /* Styles propres à l'écran Organisation */
+  .layout {
+    width: 100%;
+    max-width: var(--content-max-w);
+    margin: 0 auto;
+    padding: 24px 36px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .topbar, .breadcrumb-bar, .page-head, .layout { padding-left: 18px; padding-right: 18px; }
+  }
+
+  /* Actions Consultation / Modification */
+  .org-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    max-width: var(--content-max-w);
+    margin: 14px auto 0;
+    padding: 0 36px;
+  }
+  @media (max-width: 600px) {
+    .org-actions { padding-left: 18px; padding-right: 18px; }
+  }
+  .org-actions .filter-btn {
+    border-radius: 10px;
+    padding: 0 22px;
+    font-weight: 700;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .org-actions .filter-btn.is-active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  /* Carte table modernisée */
+  #toolbar-mount .toolbar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 10px;
+    border-radius: var(--radius);
+  }
+  #table-mount .list-card {
+    box-shadow: var(--shadow-md);
+  }
+
+  #btn-all.is-active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* État vide : message d'accompagnement au lieu d'un tableau blanc */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--ink-faint);
+  }
+  .empty-state strong { color: var(--ink-soft); font-size: 13.5px; }
+  .empty-state span { font-size: 12.5px; }
+
+  /* Badges de type, colorés par catégorie */
+  .type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .type-pill.type-etat        { color: var(--accent-ink); background: var(--accent-soft); }
+  .type-pill.type-institution { color: #1e3a8a; background: #dbeafe; }
+  .type-pill.type-ministere   { color: var(--accent-ink); background: var(--accent-soft); }
+  .type-pill.type-dotation    { color: #7c3a00; background: var(--orange-soft); }
+  .type-pill.type-programme   { color: #713f12; background: var(--gold-soft); }
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar : navigation propre au module Référentiels -->
+  <aside class="app-sidebar">
+    <nav class="app-nav" id="sidebar-mount"></nav>
+  </aside>
+
+  <!-- Colonne principale -->
+  <div class="app-main">
+
+    <div id="navbar-mount"></div>
+
+    <div class="banner-bar">
+      <div id="banner-mount"></div>
+    </div>
+
+    <div class="breadcrumb-bar" id="breadcrumb-mount"></div>
+
+    <div class="org-actions">
+      <button class="filter-btn is-active" type="button" id="btn-consultation">Consultation</button>
+      <button class="filter-btn" type="button" id="btn-modification">Modification</button>
+    </div>
+
+    <div class="layout">
+      <div id="toolbar-mount"></div>
+      <div id="table-mount"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="shared/app.js"></script>
+<script>
+  SIGIF.mountSidebar('#sidebar-mount', [
+    { icon: 'home', label: 'Tableau de bord', href: 'referentiels-tableau-de-bord.html' },
+    { type: 'label', label: 'Référentiels' },
+    { icon: 'orgTree', label: 'Organisation', href: 'organisation.html', active: true },
+    { icon: 'programme', label: 'Programme', href: '#' },
+    { icon: 'compte', label: 'Compte budgétaire', href: '#' },
+    { icon: 'source', label: 'Source de financement', href: '#' },
+    { icon: 'objectif', label: 'Objectif', href: '#' },
+    { icon: 'complement', label: 'Complément', href: '#' }
+  ], {});
+
+  SIGIF.mountNavbar('#navbar-mount', {
+    userName: 'Agent DPB',
+    userRole: 'Administrateur DPB',
+    userInitials: 'AD'
+  });
+
+  SIGIF.mountBanner('#banner-mount', {
+    eyebrow: 'Portail SIGIF',
+    text: "Processus de préparation du budget de l'État du Sénégal"
+  });
+
+  SIGIF.mountBreadcrumb('#breadcrumb-mount', [
+    { label: 'Portail', href: 'portail-ecran-accueil.html' },
+    { label: 'Gestion des référentiels', href: 'referentiels-tableau-de-bord.html' },
+    { label: 'Organisation' }
+  ]);
+
+  var btnConsultation = document.getElementById('btn-consultation');
+  var btnModification = document.getElementById('btn-modification');
+  function setMode(mode) {
+    btnConsultation.classList.toggle('is-active', mode === 'consultation');
+    btnModification.classList.toggle('is-active', mode === 'modification');
+  }
+  btnConsultation.addEventListener('click', function () { setMode('consultation'); });
+  btnModification.addEventListener('click', function () { setMode('modification'); });
+
+  SIGIF.mountToolbar('#toolbar-mount', {
+    placeholder: 'Rechercher une organisation…',
+    filterLabel: 'Filtrer'
+  });
+
+  var toolbarEl = document.querySelector('#toolbar-mount .toolbar');
+  var btnAll = null;
+  var searchInput = null;
+  if (toolbarEl) {
+    var existingFilterBtn = toolbarEl.querySelector('.filter-btn');
+    if (existingFilterBtn) { existingFilterBtn.remove(); }
+    btnAll = document.createElement('button');
+    btnAll.type = 'button';
+    btnAll.id = 'btn-all';
+    btnAll.className = 'filter-btn is-active';
+    btnAll.textContent = 'Tous';
+    toolbarEl.appendChild(btnAll);
+    searchInput = toolbarEl.querySelector('.search-box input');
+  }
+
+  // Données réelles — extrait du référentiel d'organisation budgétaire 2026
+  // (État, Institutions, Ministères — source : organisation_2026.md)
+  var TYPE_CLASS = {
+    'État': 'type-etat',
+    'Institution': 'type-institution',
+    'Ministère': 'type-ministere',
+    'Dotation': 'type-dotation',
+    'Programme': 'type-programme'
+  };
+  function typePill(type) {
+    var cls = TYPE_CLASS[type] || 'type-etat';
+    return '<span class="type-pill ' + cls + '">' + type + '</span>';
+  }
+  function row(id, label, code, type, active) {
+    return {
+      id: id, label: label, code: code, type: type, active: active,
+      cells: [
+        '<div class="row-name">' + label + '</div>',
+        id,
+        typePill(type),
+        active ? '<span class="status-pill is-active">Actif</span>' : '<span class="status-pill is-inactive">Archivé</span>'
+      ]
+    };
+  }
+
+  var allRows = [
+    row('22', 'Assemblée Nationale', 'AN', 'Institution', true),
+    row('25', 'Conseil Constitutionnel', 'CC', 'Institution', true),
+    row('27', 'Cour Suprême', 'CS', 'Institution', true),
+    row('28', 'Cour des Comptes', 'CDC', 'Institution', true),
+    row('30', 'Primature', 'PM', 'Institution', true),
+    row('10', 'Dette Publique', 'DP', 'Ministère', true),
+    row('31', "Ministère de l'Intégration Africaine, des Affaires étrangères et des Sénégalais de l'Extérieur", 'MIAAE', 'Ministère', true),
+    row('32', 'Ministère des Forces Armées', 'MFA', 'Ministère', true),
+    row('33', "Ministère de l'Intérieur et de la Sécurité publique", 'MISP', 'Ministère', true),
+    row('34', 'Ministère de la Justice', 'MJ', 'Ministère', true),
+    row('35', "Ministère de la Fonction Publique, du Travail et de la Réforme du Service Public", 'MFPT', 'Ministère', true),
+    row('40', "Ministère des Pêches et de l'Economie Maritime", 'MPEM', 'Ministère', true),
+    row('41', 'Ministère des Infrastructures', 'MI', 'Ministère', true),
+    row('43', 'Ministère des Finances et du Budget', 'MFB', 'Ministère', true),
+    row('48', "Ministère de l'Agriculture, de la Souveraineté alimentaire et de l'Elevage", 'MASAE', 'Ministère', true),
+    row('50', "Ministère de l'Education Nationale", 'MEN', 'Ministère', true),
+    row('51', 'Ministère de la Jeunesse et des Sports', 'MJS', 'Ministère', true),
+    row('54', "Ministère de la Santé et de l'Hygiène Publique", 'MSHP', 'Ministère', true),
+    row('56', "Ministère de l'Environnement et de la Transition écologique", 'METE', 'Ministère', true),
+    row('57', "Ministère de la Famille, de l'Action sociale et des Solidarités", 'MFAS', 'Ministère', true),
+    row('59', "Ministère de l'Emploi et de la Formation Professionnelle et Technique", 'MEFPT', 'Ministère', true),
+    row('60', 'Charges non Réparties', 'CNR', 'Ministère', true),
+    row('61', "Ministère de l'Economie du Plan et de la Coopération", 'MEPC', 'Ministère', true),
+    row('63', "Ministère de la Communication, des Télécommunications et du Numérique", 'MCTN', 'Ministère', true),
+    row('64', "Ministère de la Microfinance et de l'Economie sociale et solidaire", 'MMESS', 'Ministère', true),
+    row('66', "Ministère de l'Energie, du Pétrole et des Mines", 'MEPM', 'Ministère', true),
+    row('67', "Ministère de l'Urbanisme, des Collectivités territoriales et de l'Aménagement des territoires", 'MUCAT', 'Ministère', true),
+    row('68', "Ministère de l'Hydraulique et de l'assainissement", 'MHA', 'Ministère', true),
+    row('70', "Ministère de l'Industrie et du Commerce", 'MIC', 'Ministère', true),
+    row('72', 'Ministère des Transports Terrestres et Aériens', 'MTTA', 'Ministère', true),
+    row('74', "Ministère de la Culture, de l'Artisanat et du Tourisme", 'MCAT', 'Ministère', true),
+    row('75', "Ministère de l'Enseignement Supérieur de la Recherche et de l'Innovation", 'MESRI', 'Ministère', true),
+
+    row('1', "Dette Publique (Intérêts et commissions)", 'DO', 'Dotation', true),
+    row('2', "Présidence de la République", 'DO', 'Dotation', true),
+    row('3', "Assemblée Nationale", 'DO', 'Dotation', true),
+    row('6', "Conseil Constitutionnel", 'DO', 'Dotation', true),
+    row('7', "Cour Suprême", 'DO', 'Dotation', true),
+    row('8', "Cour des Comptes", 'DO', 'Dotation', true),
+    row('9', "Primature", 'DO', 'Dotation', true),
+    row('10D', "Dotation Charges non Réparties", 'DO', 'Dotation', true),
+
+    row('1001', "Pilotage, Coordination et Gestion administrative (31)", 'PG', 'Programme', true),
+    row('1002', "Pilotage coordination et gestion administrative (32)", 'PG', 'Programme', true),
+    row('1003', "Pilotage, Coordination et Gestion administrative (33)", 'PG', 'Programme', true),
+    row('1004', "Pilotage, Coordination et Gestion administrative (34)", 'PG', 'Programme', true),
+    row('1005', "Pilotage, Coordination et Gestion administrative (35)", 'PG', 'Programme', true),
+    row('1008', "Pilotage, Coordination et Gestion administrative (40)", 'PG', 'Programme', true),
+    row('1011', "Pilotage, gestion et coordination du MFB", 'PG', 'Programme', true),
+    row('1017', "Pilotage ministériel, gestion et coordination admi", 'PG', 'Programme', true),
+    row('1020', "Pilotage, Coordination et Gestion administrative (54)", 'PG', 'Programme', true),
+    row('1022', "Pilotage, Coordination et Gestion administrative (56)", 'PG', 'Programme', true),
+    row('1024', "Pilotage, Coordination et Gestion administrative (59)", 'PG', 'Programme', true),
+    row('1026', "Pilotage, Coordination et Gestion administrative (63)", 'PG', 'Programme', true),
+    row('1028', "Pilotage, Coordination et Gestion administrative (68)", 'PG', 'Programme', true),
+    row('1029', "Pilotage, Coordination et Gestion administrative (75)", 'PG', 'Programme', true),
+    row('1032', "Pilotage, Coordination et Gestion administrative (61)", 'PG', 'Programme', true),
+    row('1569', "Pilotage, Coordination et Gestion administrative (64)", 'PG', 'Programme', true),
+    row('1572', "Pilotage, Coordination et Gestion administrative (48)", 'PG', 'Programme', true),
+    row('1574', "Pilotage, Coordination et Gestion administrative (51)", 'PG', 'Programme', true),
+    row('1575', "Pilotage, Coordination et Gestion administrative (57)", 'PG', 'Programme', true),
+    row('1576', "Pilotage, Coordination et Gestion administrative (66)", 'PG', 'Programme', true),
+    row('1577', "Pilotage, Coordination et Gestion administrative (70)", 'PG', 'Programme', true),
+    row('1578', "Pilotage, Coordination et Gestion administrative (72)", 'PG', 'Programme', true),
+    row('1579', "Pilotage, Coordination et Gestion administrative (74)", 'PG', 'Programme', true),
+    row('1580', "Pilotage, Coordination et Gestion administrative (67)", 'PG', 'Programme', true),
+    row('1581', "Pilotage, Coordination et Gestion administrative (41)", 'PG', 'Programme', true),
+    row('2001', "Coopération bilatérale et multilatérale", 'PG', 'Programme', true),
+    row('2003', "Gestion des Affaires consulaires et Promotion des Sénégalais de l'Extérieur", 'PG', 'Programme', true),
+    row('2005', "Défense du territoire national", 'PG', 'Programme', true),
+    row('2008', "Sûreté publique et maitien de l'ordre", 'PG', 'Programme', true),
+    row('2009', "Sécurité publique", 'PG', 'Programme', true),
+    row('2010', "Sécurité civile", 'PG', 'Programme', true),
+    row('2011', "Administration territoriale", 'PG', 'Programme', true),
+    row('2012', "Gouvernance électorale", 'PG', 'Programme', true),
+    row('2014', "Justice judiciaire", 'PG', 'Programme', true),
+    row('2015', "Education surveillée et Protection judiciaire de l'Enfant", 'PG', 'Programme', true),
+    row('2016', "Administration pénitentiaire", 'PG', 'Programme', true),
+    row('2017', "Fonction publique", 'PG', 'Programme', true),
+    row('2018', "Renouveau du service public", 'PG', 'Programme', true),
+    row('2019', "Gouvernance du marché du travail", 'PG', 'Programme', true),
+    row('2022', "Coopération et Développement des Partenariats public-privé et Appui au Secteur privé", 'PG', 'Programme', true),
+    row('2023', "Pêche et Aquaculture", 'PG', 'Programme', true),
+    row('2024', "Infrastructures, transports fluviomaritimes et Ports", 'PG', 'Programme', true),
+    row('2028', "Développement et modernisation du réseau ferroviaire", 'PG', 'Programme', true),
+    row('2029', "Développement et modernisation des transports routiers", 'PG', 'Programme', true),
+    row('2030', "Base productive et infrastructures agropastorales", 'PG', 'Programme', true),
+    row('2031', "Production et valorisation des produits végétaux", 'PG', 'Programme', true),
+    row('2032', "Gestion ressources douanières et protection de l'économie", 'PG', 'Programme', true),
+    row('2033', "Financement, recherche, formation et appui conseil", 'PG', 'Programme', true),
+    row('2034', "Gouvernance économie, planification stratégique et coordination statistique", 'PG', 'Programme', true),
+    row('2035', "Elaboration des lois de finance et suivi de l'exécution", 'PG', 'Programme', true),
+    row('2036', "Gestion compt. et financ Etat et autres organismes publics", 'PG', 'Programme', true),
+    row('2037', "Gestion de la fiscalité intérieure et du foncier", 'PG', 'Programme', true),
+    row('2038', "Gestion du secteur financier", 'PG', 'Programme', true),
+    row('2041', "Accessibilité des produits et services, lutte contre la vie chère", 'PG', 'Programme', true),
+    row('2045', "Aménagement et développement urbain et ruraux", 'PG', 'Programme', true),
+    row('2049', "Développement des pôles et filières industrielles compétitives", 'PG', 'Programme', true),
+    row('2050', "Développement de l'Offre touristique", 'PG', 'Programme', true),
+    row('2051', "Développement du transport aérien", 'PG', 'Programme', true),
+    row('2053', "Education préscolaire", 'PG', 'Programme', true),
+    row('2054', "Enseignement Elémentaire", 'PG', 'Programme', true),
+    row('2055', "Enseignement Moyen général", 'PG', 'Programme', true),
+    row('2056', "Enseignement secondaire général", 'PG', 'Programme', true),
+    row('2057', "Education de base des jeunes et adultes", 'PG', 'Programme', true),
+    row('2059', "Développement de la pratique et des performances sportives", 'PG', 'Programme', true),
+    row('2062', "Transformation de l'Ecosystème de la Communication", 'PG', 'Programme', true),
+    row('2063', "Promotion des industries culturelles et créatives et du patrimoine", 'PG', 'Programme', true),
+    row('2064', "Prévention et promotion de la santé", 'PG', 'Programme', true),
+    row('2066', "Offre de soins de qualité", 'PG', 'Programme', true),
+    row('2070', "Promotion sociale et économique des jeunes", 'PG', 'Programme', true),
+    row('2071', "Lutte contre la déforestation et la dégradation des terres", 'PG', 'Programme', true),
+    row('2072', "Conservation de la biodiversité et gestion des aires protégées", 'PG', 'Programme', true),
+    row('2073', "Lutte contre les pollutions et nuisances / transition écologique", 'PG', 'Programme', true),
+    row('2077', "Développement des offres de formation professionnelle et technique", 'PG', 'Programme', true),
+    row('2078', "Développement de l'apprentissage", 'PG', 'Programme', true),
+    row('2079', "Productions et valorisation des produits animaux", 'PG', 'Programme', true),
+    row('2083', "Développement de l'Economie numérique", 'PG', 'Programme', true),
+    row('2084', "Transformation de l'Ecosystème postal", 'PG', 'Programme', true),
+    row('2086', "Gouvernance territoriale", 'PG', 'Programme', true),
+    row('2087', "Financement du développement territorial", 'PG', 'Programme', true),
+    row('2088', "Gestion Intégrée des Ressources en Eau", 'PG', 'Programme', true),
+    row('2089', "Accès sécurisé à l'Eau Multi-Usage", 'PG', 'Programme', true),
+    row('2090', "Accès sécurisé à l'assainissement et Gestion des Eaux Pluviales", 'PG', 'Programme', true),
+    row('2091', "Education supérieure", 'PG', 'Programme', true),
+    row('2092', "OEuvres sociales universitaires", 'PG', 'Programme', true),
+    row('2100', "Bonne gouvernance et Droits humains", 'PG', 'Programme', true),
+    row('2102', "Renforcement de la microfinance", 'PG', 'Programme', true),
+    row('2103', "Développement de l'emploi", 'PG', 'Programme', true),
+    row('2107', "Protection sociale des travailleurs", 'PG', 'Programme', true),
+    row('2115', "Valorisation des substances minérales", 'PG', 'Programme', true),
+    row('2118', "Développement de l'économie sociale et solidaire", 'PG', 'Programme', true),
+    row('2120', "Accès universel à une énergie compétitive et durable", 'PG', 'Programme', true),
+    row('2121', "Développement de l'artisanat", 'PG', 'Programme', true),
+    row('2122', "Transformation Encadrement Economie informelle", 'PG', 'Programme', true),
+    row('2123', "Promotion de la destination Sénégal", 'PG', 'Programme', true),
+    row('2126', "Surveillance et maitrise des opérations", 'PG', 'Programme', true),
+    row('2127', "Recherche et Innovation", 'PG', 'Programme', true),
+    row('2128', "Promotion de l'Intégration africaine", 'PG', 'Programme', true),
+    row('2129', "Genre et Autonomisation économique des femmes", 'PG', 'Programme', true),
+    row('2130', "Famille, Enfance et Protection sociale des groupes vulnérables", 'PG', 'Programme', true),
+    row('2132', "Equité territoriale et développement des pôles", 'PG', 'Programme', true),
+    row('2133', "Gouvernance et Souveraineté numériques", 'PG', 'Programme', true),
+    row('2134', "Optimisation de l'exploitation des ressources en hydrocarbures", 'PG', 'Programme', true),
+    row('2135', "Logement, construction et cadre de vie", 'PG', 'Programme', true),
+    row('2171', "Infrastructures portuaires et aéroportuaires", 'PG', 'Programme', true),
+    row('2172', "Développement, gestion et entretien des infrastructures routières", 'PG', 'Programme', true),
+    row('2173', "Cadre de vie", 'PG', 'Programme', true),
+    row('2174', "Infrastructures sociales et administratives", 'PG', 'Programme', true),
+    row('3001', "Frais de contrôle des entreprises publiques", 'PG', 'Programme', true),
+    row('3002', "Opérations à caractère industriel et commerciale", 'PG', 'Programme', true),
+    row('3003', "Fonds de lutte contre les incendies", 'PG', 'Programme', true),
+    row('3004', "Encouragement à la Pêche et à ses industries annexes (CEPIA)", 'PG', 'Programme', true),
+    row('3005', "Gestion du Fonds national de retraite (FNR)", 'PG', 'Programme', true),
+    row('3006', "Gestion des Prêts et Avances", 'PG', 'Programme', true),
+    row('3007', "Gestion des Garanties et avals", 'PG', 'Programme', true),
+    row('3008', "Fonds intergénérationnel", 'PG', 'Programme', true),
+    row('3009', "Fonds stabilisation", 'PG', 'Programme', true),
+    row('3010', "Compte de Commerce Police", 'PG', 'Programme', true),
+    row('3011', "Compte de Commerce Administration pénitentiaire", 'PG', 'Programme', true),
+    row('3013', "Fonds de Restructuration des Sociétés à Participation Publique", 'PG', 'Programme', true)
+  ];
+
+  function renderTable(filteredRows) {
+    SIGIF.mountTable('#table-mount', {
+      title: 'Liste des organisations',
+      count: filteredRows.length + ' sur ' + allRows.length,
+      columns: ['Organisation', 'Code', 'Type', 'Statut'],
+      rows: filteredRows.map(function (r) { return r.cells; }),
+      page: 1,
+      pageCount: 1
+    });
+
+    if (filteredRows.length === 0) {
+      var tbody = document.querySelector('#table-mount .data-table tbody');
+      var colCount = 4;
+      if (tbody) {
+        var message = hasStarted
+          ? { title: 'Aucun résultat', hint: "Essayez un autre terme ou changez de filtre." }
+          : { title: 'Aucune organisation affichée', hint: 'Cliquez sur "Tous" ou lancez une recherche pour afficher la liste.' };
+        tbody.innerHTML =
+          '<tr><td colspan="' + colCount + '">' +
+            '<div class="empty-state">' +
+              '<strong>' + message.title + '</strong>' +
+              '<span>' + message.hint + '</span>' +
+            '</div>' +
+          '</td></tr>';
+      }
+    }
+  }
+
+  var hasStarted = false;
+
+  function applyFilter(query) {
+    query = (query || '').trim().toLowerCase();
+    if (btnAll) { btnAll.classList.toggle('is-active', false); }
+    var filtered = allRows.filter(function (r) {
+      return query === '' ||
+        r.label.toLowerCase().indexOf(query) !== -1 ||
+        r.code.toLowerCase().indexOf(query) !== -1 ||
+        r.type.toLowerCase().indexOf(query) !== -1 ||
+        r.id.indexOf(query) !== -1;
+    });
+    renderTable(filtered);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      hasStarted = true;
+      applyFilter(searchInput.value);
+    });
+  }
+  if (btnAll) {
+    btnAll.addEventListener('click', function () {
+      if (searchInput) { searchInput.value = ''; }
+      hasStarted = true;
+      btnAll.classList.add('is-active');
+      renderTable(allRows);
+    });
+  }
+
+  // Table vide par défaut : la liste complète ne s'affiche qu'au clic sur "Tous" ou une recherche
+  renderTable([]);
+</script>
+
+</body>
+</html>

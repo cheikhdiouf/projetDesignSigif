@@ -74,16 +74,15 @@
   SIGIF.mountSidebar('#sidebar-mount', [
     { icon: 'home', label: 'Tableau de bord', href: 'referentiels-tableau-de-bord.html', active: true },
     { type: 'label', label: 'Référentiels' },
-    { icon: 'orgTree', label: 'Organisation', href: '#' },
+    { icon: 'orgTree', label: 'Organisation', href: 'organisation.html' },
     { icon: 'programme', label: 'Programme', href: '#' },
     { icon: 'compte', label: 'Compte budgétaire', href: '#' },
     { icon: 'source', label: 'Source de financement', href: '#' },
     { icon: 'objectif', label: 'Objectif', href: '#' },
     { icon: 'complement', label: 'Complément', href: '#' }
-  ]);
+  ], {});
 
   SIGIF.mountNavbar('#navbar-mount', {
-    brandSub: 'Préparation budgétaire',
     userName: 'Agent DPB',
     userRole: 'Administrateur DPB',
     userInitials: 'AD'
@@ -106,7 +105,7 @@
       icon: 'orgTree', tint: 'leaf',
       title: 'Organisation',
       stat: { value: '3', label: 'niveaux : Ministère → Programme → Service' },
-      href: '#'
+      href: 'organisation.html'
     },
     {
       icon: 'programme', tint: 'gold',
